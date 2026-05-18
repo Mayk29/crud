@@ -72,6 +72,85 @@
 
       <button type="button" class="btn btn-primary btn-sm" ng-click="addBeneficiary()">Add Beneficiary</button>
 
+      <div class="clearfix"></div><hr>
+
+      <!-- ── FILE ATTACHMENTS ────────────────────────────────────────── -->
+      <h4>Attachments</h4>
+
+      <!-- Already-saved files -->
+      <table class="table table-bordered" ng-if="existingFiles.length > 0">
+        <thead>
+          <tr>
+            <th style="width:30px;">#</th>
+            <th>File Name</th>
+            <th>Size</th>
+            <th>Uploaded</th>
+            <th style="width:160px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="file in existingFiles">
+            <td>{{ $index + 1 }}</td>
+            <td><i class="fa fa-file-o"></i> {{ file.original }}</td>
+            <td>{{ formatSize(file.size) }}</td>
+            <td>{{ file.created }}</td>
+            <td>
+              <a href="{{ file.url }}" target="_blank" download="{{ file.original }}"
+                 class="btn btn-success btn-xs">
+                <i class="fa fa-download"></i> Download
+              </a>
+              &nbsp;
+              <button type="button" class="btn btn-danger btn-xs" ng-click="deleteFile(file)">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="text-muted" ng-if="existingFiles.length == 0 && pendingFiles.length == 0">
+        <small>No attachments yet.</small>
+      </p>
+
+      <!-- Pending (new) files queue -->
+      <div ng-if="pendingFiles.length > 0">
+        <p><strong>Files to be uploaded on save:</strong></p>
+        <table class="table table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>File Name</th>
+              <th>Size</th>
+              <th style="width:80px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="file in pendingFiles">
+              <td>{{ $index + 1 }}</td>
+              <td><i class="fa fa-file-o text-warning"></i> {{ file.name }}</td>
+              <td>{{ formatSize(file.size) }}</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-xs" ng-click="removePendingFile($index)">
+                  <i class="fa fa-times"></i> Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- File picker -->
+      <input type="file" id="fileInputEdit" multiple style="display:none;"
+             onchange="angular.element(this).scope().onFileSelect(this)">
+      <button type="button" class="btn btn-default btn-sm"
+              onclick="document.getElementById('fileInputEdit').click()">
+        <i class="fa fa-paperclip"></i> Attach File(s)
+      </button>
+      <small class="text-muted" style="margin-left:8px;">
+        Allowed: images, PDF, Word, Excel, TXT &mdash; max 10 MB each
+      </small>
+      <!-- ── END FILE ATTACHMENTS ──────────────────────────────────── -->
+
       <br><br>
 
       <div class="row">

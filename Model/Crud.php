@@ -94,6 +94,12 @@ class Crud extends AppModel {
       'className'  => 'Beneficiary',
       'foreignKey' => 'crud_id',
       'dependent'  => true
+    ),
+    'CrudFile' => array(
+      'className'  => 'CrudFile',
+      'foreignKey' => 'crud_id',
+      'conditions' => array('CrudFile.visible' => true),
+      'dependent'  => true
     )
   );
 

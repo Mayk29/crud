@@ -74,6 +74,51 @@
 
       <div class="clearfix"></div><hr>
 
+      <!-- ── FILE ATTACHMENTS ────────────────────────────────────────── -->
+      <h4>Attachments</h4>
+
+      <!-- Pending files queue -->
+      <table class="table table-bordered" ng-if="pendingFiles.length > 0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>File Name</th>
+            <th>Size</th>
+            <th style="width:80px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="file in pendingFiles">
+            <td>{{ $index + 1 }}</td>
+            <td><i class="fa fa-file-o"></i> {{ file.name }}</td>
+            <td>{{ formatSize(file.size) }}</td>
+            <td>
+              <button type="button" class="btn btn-danger btn-xs" ng-click="removePendingFile($index)">
+                <i class="fa fa-times"></i> Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="text-muted" ng-if="pendingFiles.length == 0">
+        <small>No files attached yet.</small>
+      </p>
+
+      <!-- File picker (hidden, triggered by button) -->
+      <input type="file" id="fileInput" multiple style="display:none;"
+             onchange="angular.element(this).scope().onFileSelect(this)">
+      <button type="button" class="btn btn-default btn-sm"
+              onclick="document.getElementById('fileInput').click()">
+        <i class="fa fa-paperclip"></i> Attach File(s)
+      </button>
+      <small class="text-muted" style="margin-left:8px;">
+        Allowed: images, PDF, Word, Excel, TXT &mdash; max 10 MB each
+      </small>
+      <!-- ── END FILE ATTACHMENTS ──────────────────────────────────── -->
+
+      <div class="clearfix"></div><hr>
+
       <div class="row">
         <div class="col-md-2 pull-right">
           <button class="btn btn-primary btn-sm btn-block" ng-click="save()">SAVE</button>

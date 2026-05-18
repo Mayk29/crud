@@ -1,6 +1,6 @@
 <?php
 class PrintController extends AppController {
-  public $uses = array('Crud');
+  public $uses = array('Crud', 'Beneficiary');
   public $layout = null;
 
   // Print CRUDS index 
@@ -47,6 +47,34 @@ class PrintController extends AppController {
 
     $this->set('cruds', $cruds);
     $this->set('filterLabel', $filterLabel);
+  }
+
+  // Print CRUD view (single record + beneficiaries) — APPROVED only
+  // GET /print/crud_view/1
+  public function crud_view($id = null) {
+    $crud = $this->Crud->find('first', array(
+      'conditions' => array('Crud.id' => $id, 'Crud.visible' => true),
+      'contain'    => array('Beneficiary', 'CrudStatus')
+    ));
+
+    if (!$crud) {
+      throw new NotFoundException('Record not found.');
+    }
+
+    $status = !empty($crud['CrudStatus']['name']) ? $crud['CrudStatus']['name'] : 'PENDING';
+
+    $data = array(
+      'id'          => $crud['Crud']['id'],
+      'name'        => $crud['Crud']['name'],
+      'email'       => $crud['Crud']['email'],
+      'birthDate'   => $crud['Crud']['birthDate'],
+      'age'         => (int) $crud['Crud']['age'],
+      'status'      => $status,
+      'created'     => date('m/d/Y', strtotime($crud['Crud']['created'])),
+      'Beneficiary' => $crud['Beneficiary'],
+    );
+
+    $this->set('crud', $data);
   }
 
 }

@@ -60,6 +60,42 @@
 
     <hr>
 
+    <!-- ── ATTACHMENTS ────────────────────────────────────────────── -->
+    <h4>Attachments</h4>
+
+    <table class="table table-bordered" ng-if="data.CrudFile && data.CrudFile.length > 0">
+      <thead>
+        <tr>
+          <th style="width:30px;">#</th>
+          <th>File Name</th>
+          <th>Size</th>
+          <th>Uploaded</th>
+          <th style="width:100px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="file in data.CrudFile">
+          <td>{{ $index + 1 }}</td>
+          <td><i class="fa fa-file-o"></i> {{ file.original }}</td>
+          <td>{{ formatSize(file.size) }}</td>
+          <td>{{ file.created }}</td>
+          <td>
+            <a href="{{ file.url }}" target="_blank" download="{{ file.original }}"
+               class="btn btn-success btn-xs">
+              <i class="fa fa-download"></i> Download
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="text-muted" ng-if="!data.CrudFile || data.CrudFile.length == 0">
+      <small>No attachments found.</small>
+    </p>
+    <!-- ── END ATTACHMENTS ──────────────────────────────────────── -->
+
+    <hr>
+
     <div class="row">
       <!-- Back -->
       <div class="col-md-2">
@@ -89,6 +125,17 @@
           <i class="fa fa-times"></i> DISAPPROVE
         </button>
       </div>
+
+      <!-- Print — enabled only when APPROVED -->
+      <div class="col-md-2">
+        <button class="btn btn-warning btn-sm btn-block"
+                ng-click="print()"
+                ng-disabled="data.status != 'APPROVED'"
+                title="{{ data.status != 'APPROVED' ? 'Only APPROVED records can be printed' : 'Print this record' }}">
+          <i class="fa fa-print"></i> PRINT
+        </button>
+      </div>
+
     </div>
 
   </div>

@@ -5,14 +5,14 @@ App::uses('CakeEmail', 'Network/Email');
 class CrudsController extends AppController {
 
   public $components = array('Paginator', 'RequestHandler');
-  public $uses = array('Crud', 'CrudStatus');
+  public $uses = array('Crud', 'CrudStatus', 'CrudFile');
 
   public function beforeFilter() {
     parent::beforeFilter();
     $this->RequestHandler->ext = 'json';
   }
 
-  // ─── PRIVATE HELPER: send email notification ────────────────────────────────
+  // PRIVATE HELPER: send email notification 
   private function _sendEmail($to, $subject, $message) {
     try {
       $Email = new CakeEmail('default'); 
@@ -26,7 +26,7 @@ class CrudsController extends AppController {
     }
   }
 
-  // ─── INDEX ──────────────────────────────────────────────────────────────────
+  // INDEX 
   // GET /api/cruds.json?page=1&search=&searchName=&searchAge=&searchStatus=&tabStatus=
   public function index() {
     $page         = isset($this->request->query['page'])         ? $this->request->query['page']         : 1;
@@ -79,18 +79,34 @@ class CrudsController extends AppController {
     $this->set(array('response' => $response, '_serialize' => 'response'));
   }
 
-  // ─── VIEW ───────────────────────────────────────────────────────────────────
+  // VIEW 
   // GET /api/cruds/1.json
   public function view($id = null) {
     $crud = $this->Crud->find('first', array(
       'conditions' => array('Crud.id' => $id, 'Crud.visible' => true),
-      'contain'    => array('Beneficiary', 'CrudStatus')
+      'contain'    => array('Beneficiary', 'CrudStatus', 'CrudFile')
     ));
 
     if (!$crud) {
       $response = array('ok' => false, 'msg' => 'Record not found.');
     } else {
       $status = !empty($crud['CrudStatus']['name']) ? $crud['CrudStatus']['name'] : 'PENDING';
+
+      // Build files list with download URL
+      $files = array();
+      if (!empty($crud['CrudFile'])) {
+        foreach ($crud['CrudFile'] as $f) {
+          $files[] = array(
+            'id'       => $f['id'],
+            'original' => $f['original'],
+            'size'     => $f['size'],
+            'mime'     => $f['mime'],
+            'created'  => date('m/d/Y', strtotime($f['created'])),
+            'url'      => $this->request->base . '/uploads/crud_files/' . $f['filename'],
+          );
+        }
+      }
+
       $response = array(
         'ok'   => true,
         'data' => array(
@@ -101,6 +117,7 @@ class CrudsController extends AppController {
           'age'         => (int) $crud['Crud']['age'],
           'status'      => $status,
           'Beneficiary' => $crud['Beneficiary'],
+          'CrudFile'    => $files,
         ),
       );
     }
@@ -108,7 +125,7 @@ class CrudsController extends AppController {
     $this->set(array('response' => $response, '_serialize' => 'response'));
   }
 
-  // ─── ADD ────────────────────────────────────────────────────────────────────
+  // ADD 
   // POST /api/cruds.json
   public function add() {
     $data = $this->request->data['Crud'];
@@ -156,7 +173,7 @@ class CrudsController extends AppController {
         $this->_sendEmail($data['email'], $subject, $message);
       }
 
-      $response = array('ok' => true, 'msg' => 'Record saved successfully.');
+      $response = array('ok' => true, 'msg' => 'Record saved successfully.', 'id' => $crud_id);
     } else {
       $response = array('ok' => false, 'msg' => 'Could not save record.');
     }
@@ -164,7 +181,7 @@ class CrudsController extends AppController {
     $this->set(array('response' => $response, '_serialize' => 'response'));
   }
 
-  // ─── EDIT ───────────────────────────────────────────────────────────────────
+  // EDIT 
   // PUT /api/cruds/1.json
   // Also handles approve/disapprove when Crud.status_name is passed
   public function edit($id = null) {
@@ -251,7 +268,7 @@ class CrudsController extends AppController {
     $this->set(array('response' => $response, '_serialize' => 'response'));
   }
 
-  // ─── PRINT INDEX ────────────────────────────────────────────────────────────
+  // PRINT INDEX 
   // GET /api/cruds/print_index.json
   public function print_index() {
     $conditions = array(
@@ -281,13 +298,145 @@ class CrudsController extends AppController {
     $this->set(array('response' => $response, '_serialize' => 'response'));
   }
 
-  // ─── DELETE ─────────────────────────────────────────────────────────────────
+  // DELETE 
   // DELETE /api/cruds/1.json
   public function delete($id = null) {
     if ($this->Crud->save(array('id' => $id, 'visible' => false))) {
       $response = array('ok' => true, 'msg' => 'Record deleted.');
     } else {
       $response = array('ok' => false, 'msg' => 'Could not delete record.');
+    }
+
+    $this->set(array('response' => $response, '_serialize' => 'response'));
+  }
+
+  // UPLOAD FILE
+  // POST /api/cruds/upload_file/1.json
+  public function upload_file($id = null) {
+    // Verify the CRUD record exists
+    $crud = $this->Crud->find('first', array(
+      'conditions' => array('Crud.id' => $id, 'Crud.visible' => true),
+      'contain'    => false
+    ));
+
+    if (!$crud) {
+      $response = array('ok' => false, 'msg' => 'Record not found.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    if (empty($_FILES['file'])) {
+      $response = array('ok' => false, 'msg' => 'No file received.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    $file = $_FILES['file'];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+      $response = array('ok' => false, 'msg' => 'File upload error (code ' . $file['error'] . ').');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    // 10 MB limit
+    $maxSize = 10 * 1024 * 1024;
+    if ($file['size'] > $maxSize) {
+      $response = array('ok' => false, 'msg' => 'File exceeds 10 MB limit.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    // Allowed MIME types
+    $allowedMimes = array(
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain',
+    );
+
+    $mime = mime_content_type($file['tmp_name']);
+    if (!in_array($mime, $allowedMimes)) {
+      $response = array('ok' => false, 'msg' => 'File type not allowed.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    // Prepare upload directory: webroot/uploads/crud_files/
+    $uploadDir = WWW_ROOT . 'uploads' . DS . 'crud_files' . DS;
+    if (!is_dir($uploadDir)) {
+      mkdir($uploadDir, 0755, true);
+    }
+
+    // Generate unique filename preserving extension
+    $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $stored   = uniqid('cf_') . ($ext ? '.' . $ext : '');
+    $destPath = $uploadDir . $stored;
+
+    if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+      $response = array('ok' => false, 'msg' => 'Could not save file to disk.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    // Save record in DB
+    $this->CrudFile->create();
+    $saved = $this->CrudFile->save(array(
+      'crud_id'  => $id,
+      'filename' => $stored,
+      'original' => $file['name'],
+      'size'     => $file['size'],
+      'mime'     => $mime,
+    ));
+
+    if ($saved) {
+      $newFile = array(
+        'id'       => $this->CrudFile->id,
+        'original' => $file['name'],
+        'size'     => $file['size'],
+        'mime'     => $mime,
+        'created'  => date('m/d/Y'),
+        'url'      => $this->request->base . '/uploads/crud_files/' . $stored,
+      );
+      $response = array('ok' => true, 'msg' => 'File uploaded successfully.', 'file' => $newFile);
+    } else {
+      // Rollback the file on DB failure
+      @unlink($destPath);
+      $response = array('ok' => false, 'msg' => 'Could not save file record.');
+    }
+
+    $this->set(array('response' => $response, '_serialize' => 'response'));
+  }
+
+  // DELETE FILE
+  // DELETE /api/cruds/delete_file/1.json  (1 = crud_file id)
+  public function delete_file($id = null) {
+    $crudFile = $this->CrudFile->find('first', array(
+      'conditions' => array('CrudFile.id' => $id, 'CrudFile.visible' => true),
+      'contain'    => false
+    ));
+
+    if (!$crudFile) {
+      $response = array('ok' => false, 'msg' => 'File record not found.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    // Soft-delete the record
+    $saved = $this->CrudFile->save(array('id' => $id, 'visible' => false));
+
+    if ($saved) {
+      // Remove physical file
+      $filePath = WWW_ROOT . 'uploads' . DS . 'crud_files' . DS . $crudFile['CrudFile']['filename'];
+      if (file_exists($filePath)) {
+        @unlink($filePath);
+      }
+      $response = array('ok' => true, 'msg' => 'File deleted.');
+    } else {
+      $response = array('ok' => false, 'msg' => 'Could not delete file.');
     }
 
     $this->set(array('response' => $response, '_serialize' => 'response'));

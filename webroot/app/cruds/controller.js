@@ -7,27 +7,15 @@ app.controller('CrudsController', function($scope, Crud) {
   $scope.lastAdvanceParams = null;
   $scope.searchTxt         = '';
 
-  // Build params object from current state
   $scope.buildParams = function(page) {
     var params = { page: page || 1 };
-
-    // Tab filter
-    if ($scope.activeTab !== 'ALL') {
-      params.tabStatus = $scope.activeTab;
-    }
-
-    // Advance search fields
+    if ($scope.activeTab !== 'ALL') { params.tabStatus = $scope.activeTab; }
     if ($scope.lastAdvanceParams) {
       if ($scope.lastAdvanceParams.searchName)   params.searchName   = $scope.lastAdvanceParams.searchName;
       if ($scope.lastAdvanceParams.searchAge)    params.searchAge    = $scope.lastAdvanceParams.searchAge;
       if ($scope.lastAdvanceParams.searchStatus) params.searchStatus = $scope.lastAdvanceParams.searchStatus;
     }
-
-    // Simple search
-    if ($scope.searchTxt) {
-      params.search = $scope.searchTxt;
-    }
-
+    if ($scope.searchTxt) { params.search = $scope.searchTxt; }
     return params;
   };
 
@@ -44,25 +32,21 @@ app.controller('CrudsController', function($scope, Crud) {
 
   $scope.load();
 
-  // Simple search
   $scope.search = function(search) {
     $scope.searchTxt         = search || '';
     $scope.lastAdvanceParams = null;
     $scope.load(1);
   };
 
-  // Tab switching
   $scope.setTab = function(tab) {
     $scope.activeTab = tab;
     $scope.load(1);
   };
 
-  // Toggle advance search panel
   $scope.toggleAdvanceSearch = function() {
     $scope.showAdvanceSearch = !$scope.showAdvanceSearch;
   };
 
-  // Run advance search
   $scope.doAdvanceSearch = function(page) {
     $scope.lastAdvanceParams = {
       searchName:   $scope.advanceSearch.name   || '',
@@ -72,7 +56,6 @@ app.controller('CrudsController', function($scope, Crud) {
     $scope.load(page || 1);
   };
 
-  // Reset advance search
   $scope.resetAdvanceSearch = function() {
     $scope.advanceSearch     = {};
     $scope.lastAdvanceParams = null;
@@ -80,7 +63,6 @@ app.controller('CrudsController', function($scope, Crud) {
     $scope.load(1);
   };
 
-  // Print — passes current tab/search filters so the print page is filtered too
   $scope.print = function() {
     var params = $scope.buildParams(1);
     delete params.page;
@@ -108,60 +90,91 @@ app.controller('CrudsController', function($scope, Crud) {
 });
 
 // ─── ADD CRUD ─────────────────────────────────────────────────────────────────
-app.controller('CrudsAddController', function($scope, Crud) {
+app.controller('CrudsAddController', function($scope, $http, Crud) {
 
-  $scope.data = { Crud: {} };
+  $scope.data          = { Crud: {} };
   $scope.beneficiaries = [];
+  $scope.pendingFiles  = [];
 
   $scope.computeAge = function() {
     if (!$scope.data.Crud.birthDate) return;
-    var today     = new Date();
-    var birthDate = new Date($scope.data.Crud.birthDate);
-    var age       = today.getFullYear() - birthDate.getFullYear();
-    var m         = today.getMonth() - birthDate.getMonth();
+    var today = new Date(), birthDate = new Date($scope.data.Crud.birthDate);
+    var age   = today.getFullYear() - birthDate.getFullYear();
+    var m     = today.getMonth() - birthDate.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
     $scope.data.Crud.age = age;
   };
 
-  $scope.addBeneficiary = function() {
-    $scope.beneficiaries.push({ name: '', birthDate: '', age: '' });
+  $scope.addBeneficiary    = function() { $scope.beneficiaries.push({ name: '', birthDate: '', age: '' }); };
+  $scope.removeBeneficiary = function(i) { $scope.beneficiaries.splice(i, 1); };
+
+  $scope.computeBeneficiaryAge = function(b) {
+    if (!b.birthDate) return;
+    var today = new Date(), bd = new Date(b.birthDate);
+    var age   = today.getFullYear() - bd.getFullYear();
+    var m     = today.getMonth() - bd.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+    b.age = age;
   };
 
-  $scope.removeBeneficiary = function(index) {
-    $scope.beneficiaries.splice(index, 1);
-  };
-
-  $scope.computeBeneficiaryAge = function(beneficiary) {
-    if (!beneficiary.birthDate) return;
-    var today     = new Date();
-    var birthDate = new Date(beneficiary.birthDate);
-    var age       = today.getFullYear() - birthDate.getFullYear();
-    var m         = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-    beneficiary.age = age;
-  };
-
-  // Client-side email format check
   $scope.isValidEmail = function(email) {
-    if (!email) return true; // empty is allowed (not required)
-    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    if (!email) return true;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  $scope.formatSize = function(bytes) {
+    if (!bytes)          return '0 B';
+    if (bytes < 1024)    return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  };
+
+  $scope.onFileSelect = function(el) {
+    for (var i = 0; i < el.files.length; i++) $scope.pendingFiles.push(el.files[i]);
+    $scope.$apply();
+    el.value = '';
+  };
+
+  $scope.removePendingFile = function(i) { $scope.pendingFiles.splice(i, 1); };
+
+  $scope._uploadPendingFiles = function(crudId, callback) {
+    if (!$scope.pendingFiles.length) { callback(); return; }
+    var remaining = $scope.pendingFiles.length, errors = [];
+    angular.forEach($scope.pendingFiles, function(file) {
+      var fd = new FormData();
+      fd.append('file', file);
+      $http.post(api + 'cruds/upload_file/' + crudId + '.json', fd, {
+        transformRequest: angular.identity,
+        headers: { 'Content-Type': undefined }
+      }).then(function(res) {
+        if (!res.data.ok) errors.push(file.name + ': ' + res.data.msg);
+      }, function() {
+        errors.push(file.name + ': upload request failed');
+      }).finally(function() {
+        remaining--;
+        if (remaining === 0) callback(errors.length ? errors.join('\n') : null);
+      });
+    });
   };
 
   $scope.save = function() {
-    // Email validation before submitting
     if ($scope.data.Crud.email && !$scope.isValidEmail($scope.data.Crud.email)) {
       $.gritter.add({ title: 'Warning!', text: 'Please enter a valid email address.' });
       return;
     }
-
     var valid = $('#form').validationEngine('validate');
     if (valid) {
       $scope.data.Beneficiary = $scope.beneficiaries;
       Crud.save($scope.data, function(e) {
         if (e.ok) {
-          $.gritter.add({ title: 'Successful!', text: e.msg });
-          window.location = '#/cruds';
+          $scope._uploadPendingFiles(e.id || null, function(uploadErr) {
+            if (uploadErr) {
+              $.gritter.add({ title: 'Warning!', text: 'Record saved but some files failed:\n' + uploadErr });
+            } else {
+              $.gritter.add({ title: 'Successful!', text: e.msg });
+            }
+            window.location = '#/cruds';
+          });
         } else {
           $.gritter.add({ title: 'Warning!', text: e.msg });
         }
@@ -172,7 +185,7 @@ app.controller('CrudsAddController', function($scope, Crud) {
 });
 
 // ─── VIEW CRUD ────────────────────────────────────────────────────────────────
-app.controller('CrudsViewController', function($scope, $routeParams, Crud) {
+app.controller('CrudsViewController', function($scope, $routeParams, Crud, CrudFile) {
 
   $scope.id   = $routeParams.id;
   $scope.data = {};
@@ -188,7 +201,13 @@ app.controller('CrudsViewController', function($scope, $routeParams, Crud) {
 
   $scope.load();
 
-  // Approve — uses standard PUT /api/cruds/:id.json with status_name payload
+  $scope.formatSize = function(bytes) {
+    if (!bytes)          return '0 B';
+    if (bytes < 1024)    return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  };
+
   $scope.approve = function() {
     bootbox.confirm('Are you sure you want to APPROVE this record?', function(c) {
       if (c) {
@@ -204,7 +223,6 @@ app.controller('CrudsViewController', function($scope, $routeParams, Crud) {
     });
   };
 
-  // Disapprove — uses standard PUT /api/cruds/:id.json with status_name payload
   $scope.disapprove = function() {
     bootbox.confirm('Are you sure you want to DISAPPROVE this record?', function(c) {
       if (c) {
@@ -220,48 +238,53 @@ app.controller('CrudsViewController', function($scope, $routeParams, Crud) {
     });
   };
 
+  $scope.print = function() {
+    if ($scope.data.status !== 'APPROVED') return;
+    window.open(base + '/print/crud_view/' + $scope.id, '_blank');
+  };
+
 });
 
 // ─── EDIT CRUD ────────────────────────────────────────────────────────────────
-app.controller('CrudsEditController', function($scope, $routeParams, Crud) {
+app.controller('CrudsEditController', function($scope, $routeParams, $http, Crud, CrudFile) {
 
   $scope.id            = $routeParams.id;
   $scope.data          = { Crud: {} };
   $scope.beneficiaries = [];
+  $scope.existingFiles = [];
+  $scope.pendingFiles  = [];
 
   $scope.computeAge = function() {
     if (!$scope.data.Crud.birthDate) return;
-    var today     = new Date();
-    var birthDate = new Date($scope.data.Crud.birthDate);
-    var age       = today.getFullYear() - birthDate.getFullYear();
-    var m         = today.getMonth() - birthDate.getMonth();
+    var today = new Date(), birthDate = new Date($scope.data.Crud.birthDate);
+    var age   = today.getFullYear() - birthDate.getFullYear();
+    var m     = today.getMonth() - birthDate.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
     $scope.data.Crud.age = age;
   };
 
-  $scope.addBeneficiary = function() {
-    $scope.beneficiaries.push({ name: '', birthDate: '', age: '' });
+  $scope.addBeneficiary    = function() { $scope.beneficiaries.push({ name: '', birthDate: '', age: '' }); };
+  $scope.removeBeneficiary = function(i) { $scope.beneficiaries.splice(i, 1); };
+
+  $scope.computeBeneficiaryAge = function(b) {
+    if (!b.birthDate) return;
+    var today = new Date(), bd = new Date(b.birthDate);
+    var age   = today.getFullYear() - bd.getFullYear();
+    var m     = today.getMonth() - bd.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+    b.age = age;
   };
 
-  $scope.removeBeneficiary = function(index) {
-    $scope.beneficiaries.splice(index, 1);
-  };
-
-  $scope.computeBeneficiaryAge = function(beneficiary) {
-    if (!beneficiary.birthDate) return;
-    var today     = new Date();
-    var birthDate = new Date(beneficiary.birthDate);
-    var age       = today.getFullYear() - birthDate.getFullYear();
-    var m         = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-    beneficiary.age = age;
-  };
-
-  // Client-side email format check
   $scope.isValidEmail = function(email) {
     if (!email) return true;
-    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  $scope.formatSize = function(bytes) {
+    if (!bytes)          return '0 B';
+    if (bytes < 1024)    return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
   };
 
   $scope.load = function() {
@@ -275,26 +298,79 @@ app.controller('CrudsEditController', function($scope, $routeParams, Crud) {
           age:       e.data.age
         };
         $scope.beneficiaries = e.data.Beneficiary || [];
+        $scope.existingFiles = e.data.CrudFile    || [];
       }
     });
   };
 
   $scope.load();
 
+  $scope.onFileSelect = function(el) {
+    for (var i = 0; i < el.files.length; i++) $scope.pendingFiles.push(el.files[i]);
+    $scope.$apply();
+    el.value = '';
+  };
+
+  $scope.removePendingFile = function(i) { $scope.pendingFiles.splice(i, 1); };
+
+  $scope.deleteFile = function(file) {
+    bootbox.confirm('Delete file "' + file.original + '"?', function(c) {
+      if (c) {
+        CrudFile.deleteFile({ id: file.id }, function(e) {
+          if (e.ok) {
+            $.gritter.add({ title: 'Deleted!', text: e.msg });
+            var idx = $scope.existingFiles.indexOf(file);
+            if (idx > -1) $scope.$apply(function() { $scope.existingFiles.splice(idx, 1); });
+          } else {
+            $.gritter.add({ title: 'Warning!', text: e.msg });
+          }
+        });
+      }
+    });
+  };
+
+  $scope._uploadPendingFiles = function(callback) {
+    if (!$scope.pendingFiles.length) { callback(); return; }
+    var remaining = $scope.pendingFiles.length, errors = [];
+    angular.forEach($scope.pendingFiles, function(file) {
+      var fd = new FormData();
+      fd.append('file', file);
+      $http.post(api + 'cruds/upload_file/' + $scope.id + '.json', fd, {
+        transformRequest: angular.identity,
+        headers: { 'Content-Type': undefined }
+      }).then(function(res) {
+        if (res.data.ok) {
+          $scope.existingFiles.push(res.data.file);
+        } else {
+          errors.push(file.name + ': ' + res.data.msg);
+        }
+      }, function() {
+        errors.push(file.name + ': upload request failed');
+      }).finally(function() {
+        remaining--;
+        if (remaining === 0) callback(errors.length ? errors.join('\n') : null);
+      });
+    });
+  };
+
   $scope.update = function() {
-    // Email validation before submitting
     if ($scope.data.Crud.email && !$scope.isValidEmail($scope.data.Crud.email)) {
       $.gritter.add({ title: 'Warning!', text: 'Please enter a valid email address.' });
       return;
     }
-
     var valid = $('#form-edit').validationEngine('validate');
     if (valid) {
       $scope.data.Beneficiary = $scope.beneficiaries;
       Crud.update({ id: $scope.id }, $scope.data, function(e) {
         if (e.ok) {
-          $.gritter.add({ title: 'Successful!', text: e.msg });
-          window.location = '#/cruds';
+          $scope._uploadPendingFiles(function(uploadErr) {
+            if (uploadErr) {
+              $.gritter.add({ title: 'Warning!', text: 'Record updated but some files failed:\n' + uploadErr });
+            } else {
+              $.gritter.add({ title: 'Successful!', text: e.msg });
+            }
+            window.location = '#/cruds';
+          });
         } else {
           $.gritter.add({ title: 'Warning!', text: e.msg });
         }
