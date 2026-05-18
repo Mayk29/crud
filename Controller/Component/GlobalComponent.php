@@ -1,0 +1,25 @@
+<?php
+App::uses('CakeSession', 'Model/Datasource');
+class GlobalComponent extends Component {
+   public function Settings($setting){
+        $this->Setting = ClassRegistry::init('Setting');
+        $data = $this->Setting->find('first', array(
+      'conditions'=>array(
+        'Setting.code'=>$setting
+      )
+    ));
+        if(count($data) > 0) {
+            return $data['Setting']['value'];
+        }
+        else { return null; }
+    }
+
+
+  public function TotalArr($arrs = array(), $field){
+    $total = 0;
+    foreach($arrs as $arr){
+      $total += $arr[$field];
+    }
+    return $total;
+  }
+}

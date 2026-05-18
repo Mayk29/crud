@@ -1,0 +1,13 @@
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/bootstrap-3.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/bootbox/bootbox.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/scrollbar/jquery.mCustomScrollbar.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/js/svg-icon.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/icheck/icheck.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/inputmask/jquery.inputmask.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/gritter/js/jquery.gritter.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/selectize/selectize.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/datepicker/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/validation-engine/validate.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/validation-engine/validationEngine.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/plugins/chartjs/chart.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->base ?>/assets/js/script.js"></script>

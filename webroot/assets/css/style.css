@@ -1,0 +1,430 @@
+@import url(fonts/opensans/css.css);
+@import url(fonts/homizio-nova/css.css);
+@import url(../plugins/datepicker/datepicker.css);
+@import url(../plugins/font-awesome-4.2.0/css/font-awesome.min.css);
+@import url(../plugins/icheck/skins/square/blue.css);
+@import url(../plugins/gritter/css/jquery.gritter.css);
+@import url(../plugins/selectize/selectize.css);
+@import url(../plugins/validation-engine/validation.css);
+
+body {
+	font-family: 'Open Sans';
+	overflow-y: scroll;
+}
+
+.table {
+	font-size: 12px;
+}
+
+
+
+h3.table-title {
+	font-family: 'Homizio Nova';
+	letter-spacing: 1.5px;
+	font-size: 18px;
+	margin-bottom: 20px;
+}
+
+table.center td,
+table.center th {
+	text-align: center;
+}
+
+table.vcenter td,
+table.vcenter th {
+	vertical-align: middle !important;
+}
+
+.vtop {
+	vertical-align: top !important;
+}
+
+.btn-min {
+	min-width: 120px;
+}
+
+.no-border-top td,
+.no-border-top th {
+	border-top: none !important;
+}
+
+tr.no-padding-top-bottom td,
+tr.no-padding-top-bottom th {
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+}
+.padl30px {
+	padding-left:30px !important;
+}
+.no-border-radius {
+	border-radius: 0px !important;
+}
+.italic {
+	font-style: italic;
+}
+.uppercase {
+	text-transform: uppercase;
+}
+
+.svg-icon {
+    display:inline-block;
+    width:20px;
+    height:20px;
+}
+.svg-icon svg {
+    width:100%;
+    height:100%;
+}
+
+.modal-table {
+	padding: 15px;
+}
+
+.table-action > a > i {
+	font-size:15px;
+}
+/*************** CUSTOM ***************/
+.datepicker-dropdown {
+	font-family: 'Open Sans' !important;
+}
+.navbar-nav>.open>a {
+	background: rgba(0,0,0,0) !important;
+}
+
+.menu-icon-span {
+	width: 60px;
+	height: 60px;
+	padding: 15px;
+	border-radius: 50%;
+	background: #23709e;
+}
+.menu-icon-span svg {
+	fill: #FFF;
+}
+.menu-label {
+	text-align: center;
+}
+
+.navbar-nav .dropdown-menu {
+	visibility: hidden;
+	display: block;
+	opacity: 0;
+	-webkit-transition: 300ms;
+	box-shadow: 0px 0px 5px #eee;
+}
+
+.dropdown-menu > li {
+	padding: 4px 0px;
+}
+
+.open .dropdown-menu {
+	visibility: visible;
+	opacity: 1;
+	display: block;
+}
+.header {
+	padding-top: 15px;
+}
+
+.header .header-sub-wrapper, .header .header-sub-wrapper-2 {
+	padding: 0px 30px;
+	border-bottom: 2px solid #EEE;
+}
+
+.header .header-sub-wrapper-2 {
+	padding-left: 0px;
+}
+.header .logo-link, .header .logo-link:hover {
+	color: #595959;
+	text-decoration: none;
+}
+.header a #logo {
+	color: #595959;
+	font-size: 40px;
+	font-family: 'Homizio Nova Light';
+	text-align: center;
+	line-height: 1;
+	padding-top: 30px;
+}
+
+.header a #title {
+	color: #8F8F8F;;
+	font-size: 11px;
+	text-align: center;
+	padding-bottom: 35px;
+}
+.navbar {
+	margin-bottom: 0px;
+}
+.navbar-default {
+	background: none;
+	border: none;
+}
+
+.main {
+	width: 100%;
+	margin-top: 40px;
+}
+
+
+.navbar-nav a {
+	font-size: 12px;
+	font-weight: 400;
+}
+.user-info > div {
+	text-align: center;
+}
+.user-image {
+	text-align: center;
+}
+
+.user-image img {
+	display: inline-block;
+	border: 2px solid #EEE;
+}
+.user-name {
+	padding: 8px 0px;
+	font-size: 24px;
+	text-align: center;
+	font-family: 'Homizio Nova Light';
+	letter-spacing: 1px;
+}
+.user-department {
+	padding: 4px 0px;
+	font-size: 18px;
+	font-family: 'Homizio Nova Light';
+	letter-spacing: 1.5px;
+}
+.user-designation {
+	font-family: 'Homizio Nova Light';
+	letter-spacing: 1.5px;
+}
+.menu-icon {
+	text-align: center;
+	padding: 0px 0px 10px 0px;
+}
+.menu-icon > i {
+	font-size: 24px;
+}
+
+.new-application > i {
+	font-size: 70px;
+}
+
+.logout {
+	color: #333;
+	font-size:12px;
+	-webkit-transform: ease 500ms;
+}
+
+.logout:hover {
+	text-decoration: none;
+}
+
+.system-title {
+	padding-top: 40px;
+	font-family: 'Homizio Nova Light';
+	font-size: 20px;
+	color: #626262;
+	letter-spacing: 1.5px;
+}
+
+.modal-title {
+	font-family: 'Homizio Nova';
+	letter-spacing: 1px;
+}
+
+.nav-tabs > li {
+	font-size: 12px;
+}
+/*.nav-tabs>li>a { 
+	cursor:pointer !important;
+}*/
+.sign-out {
+	padding: 0px 0px 15px 0px;
+}
+#time {
+	font-family: 'Homizio Nova Light';
+	font-size: 24px;
+	letter-spacing: 1.5px;
+	padding: 15px 0px;
+	text-align: center;
+	text-transform: uppercase;
+	border-top: 1px solid #EEE;
+}
+.member-selectdata {
+	padding-left:10px;
+	text-transform: uppercase;
+}
+.selectize-input {
+	text-transform: uppercase;
+}
+
+.search {
+	font-size: 11px;
+}
+
+.selectize-table {
+	width:100%;
+	border-bottom: 1px solid #eee;
+}
+
+.pagination-page > a {
+	width:40px;
+	text-align:center;
+}
+.pagination-active {
+	background: #dff0d8 !important;
+	color: white;
+}
+.darken {
+	background: #696969;
+	color: #FFF;
+}
+.darken-2 {
+	background: #696969;
+	color: #FFF;
+}
+.bg-blue {
+	background: #428bca !important;
+	color:#FFF;
+}
+.bg-green {
+	background: #5cb85c !important;
+	color:#FFF;
+}
+.bg-red {
+	background: #d9534f !important;
+	color:#FFF;
+}
+.font-red {
+	color: #ce3426;
+}
+.font.green {
+	color: #5cb85c;
+}
+
+/*widths*/
+.w10px {
+	width: 10px;
+}
+.w20px {
+	width: 20px;
+}
+.w30px {
+	width: 30px;
+}
+.w40px {
+	width: 40px;
+}
+.w50px {
+	width: 50px;
+}
+.w60px {
+	width: 60px;
+}
+.w70px {
+	width: 70px;
+}
+.w80px {
+	width: 80px;
+}
+.w90px {
+	width: 90px;
+}
+.w100px {
+	width: 100px;
+}
+.w110px {
+	width: 110px;
+}
+.w120px {
+	width: 120px;
+}
+.w130px {
+	width: 130px;
+}
+.w140px {
+	width: 140px;
+}
+.w150px {
+	width: 150px;
+}
+.w160px {
+	width: 160px;
+}
+.w170px {
+	width: 170px;
+}
+.w180px {
+	width: 180px;
+}
+.w190px {
+	width: 190px;
+}
+.w200px {
+	width: 200px;
+}
+.w210px {
+	width: 210px;
+}
+.w220px {
+	width: 220px;
+}
+.w230px {
+	width: 230px;
+}
+.w240px {
+	width: 240px;
+}
+.w250px {
+	width: 250px;
+}
+.w260px {
+	width: 260px;
+}
+.w70px {
+	width: 270px;
+}
+.w280px {
+	width: 280px;
+}
+.w290px {
+	width: 290px;
+}
+.w300px {
+	width: 300px;
+}
+/*fonts*/
+.f11px {
+	font:11px;
+}
+.f12px {
+	font:12px;
+}
+
+/*table padding*/
+.p10px {
+	padding: 10px;
+}
+
+h3.table-top-title {
+  font-family: 'Homizio Nova';
+  letter-spacing: 1.5px;
+  font-size: 18px;
+  padding: 10px 10px 10px 10px;
+  margin: 0px 0px 10px 0px;
+  background: #f5f5f5;
+  font-weight: 700;
+}
+
+/**** MEDIA QUERY min-width > 1300 -- max-width < 1300****/
+@media (max-width: 1300px) {
+	.system-title {
+		display: none !important;
+	}
+	.nav.navbar {
+		display: inline-block;
+	}
+}
+

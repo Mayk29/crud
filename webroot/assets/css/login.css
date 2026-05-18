@@ -1,0 +1,91 @@
+@import url(fonts/opensans/css.css);
+@import url(fonts/homizio-nova/css.css);
+
+body {
+	font-family: 'Open Sans';
+	background: url(../img/bg.jpg) fixed;
+	background-size: 100% 100%;
+}
+
+.svg-icon {
+    display:inline-block;
+    width:15px;
+    height:15px;
+    box-sizing: border-box;
+}
+.svg-icon svg {
+    width:100%;
+    height:100%;
+    fill: #fff;
+}
+
+.btn-icon {
+	width: 30px;
+	height: 30px;
+}
+
+#login {
+	padding: 20px;
+	background: rgba(0,0,0,0.15);
+}
+#login h1 {
+	font-size: 70px;
+	font-weight: 100;
+	margin: 0px;
+	text-align: center;
+	color: #FFF;
+}
+
+#login header p {
+	font-size: 14px;
+	text-shadow: rgba(255, 255, 255, 0.4) 0px 0px 3px;
+	text-align: center;
+	color: #FFF;
+	letter-spacing: 1.5px;
+	font-family: 'Homizio Nova Light';
+}
+
+#box-login {
+	width: 500px;
+	/*position: fixed;*/
+	left: 50%;
+	margin-left: -250px;
+	margin-top: 60px;
+	color: #fff;
+}
+#branch_name{
+	text-transform: uppercase;
+}
+.login-title {
+	font-weight: 100;
+	font-size: 24px;
+	margin-bottom: 20px;
+	color: #fff;
+}
+
+.btn-min {
+	min-width: 150px;
+}
+
+.input-form {
+	height: 100%;
+	padding: 15px 15px;	
+}
+
+.footer {
+	color: #FFF;
+	font-size:12px;
+	width: 100%;
+	position: fixed;
+	bottom: 0px;
+	padding: 8px;
+	background: rgba(0,0,0,0.15);
+}
+
+.copyright, .poweredby {
+	text-align: center;
+}
+
+.poweredby > a {
+	color: #77C0FF;
+}
