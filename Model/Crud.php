@@ -32,7 +32,11 @@ class Crud extends AppModel {
     // Status filter: tab filter takes priority over advance search status
     $activeStatus = !empty($tabStatus) ? $tabStatus : $searchStatus;
     if (!empty($activeStatus)) {
-      $where .= " AND IFNULL(CrudStatus.name, 'PENDING') = '$activeStatus'";
+      if ($activeStatus === 'PENDING') {
+        $where .= " AND (CrudStatus.name = 'PENDING' OR CrudStatus.name IS NULL)";
+      } else {
+        $where .= " AND CrudStatus.name = '$activeStatus'";
+      }
     }
 
     return "SELECT
@@ -66,7 +70,11 @@ class Crud extends AppModel {
     }
     $activeStatus = !empty($tabStatus) ? $tabStatus : $searchStatus;
     if (!empty($activeStatus)) {
-      $where .= " AND IFNULL(CrudStatus.name, 'PENDING') = '$activeStatus'";
+      if ($activeStatus === 'PENDING') {
+        $where .= " AND (CrudStatus.name = 'PENDING' OR CrudStatus.name IS NULL)";
+      } else {
+        $where .= " AND CrudStatus.name = '$activeStatus'";
+      }
     }
 
     return "SELECT COUNT(*) AS total

@@ -4,42 +4,52 @@
     <div class="panel-body">
     	<div class="col-md-12">
     	  <form id="form">
-          <div class="row">
-            <div class="col-md-6">
+          
+            <!-- first row -->
+            <div class="row">
+              <div class="col-md-6">
               <div class="form-group">
                 <label>Last Name <i class="required">*</i></label>
                 <input type="text" class="form-control" ng-model="data.User.last_name" data-validation-engine="validate[required]">
               </div>
-            </div>
+              </div>
+              
     
-             <div class="col-md-6">
-              <div class="form-group">
-                <label>First Name <i class="required">*</i></label>
-                <input type="text" class="form-control" ng-model="data.User.first_name" data-validation-engine="validate[required]">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>First Name <i class="required">*</i></label>
+                  <input type="text" class="form-control" ng-model="data.User.first_name" data-validation-engine="validate[required]">
+                </div>
               </div>
             </div>
-
-            <div class="col-md-4">
+            
+            <!-- second row -->
+            <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Username <i class="required">*</i></label>
                 <input type="text" class="form-control"  ng-model="data.User.username" data-validation-engine="validate[required]">
               </div>
             </div>
             
-            <div class="col-md-4">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>New Password</label>
                 <input type="password" class="form-control"  ng-model="data.User.password">
               </div>
             </div>
             
-            <div class="col-md-4">
+            
+            </div>
+
+            <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Re-type New Password</label>
                 <input type="password" class="form-control"  ng-model="confirmPassword">
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Role <i class="required">*</i></label>
                 <select class="form-control" ng-model="data.User.roleId" ng-options="opt.id as opt.value for opt in roles" data-validation-engine="validate[required]">
@@ -47,8 +57,10 @@
                 </select>
               </div>
             </div>
+            </div>
 
-            <div class="col-md-4">
+            <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Active <i class="required">*</i></label>
                 <select class="form-control" ng-model="data.User.active" ng-options="opt.id as opt.value for opt in bool" data-validation-engine="validate[required]">
@@ -57,15 +69,16 @@
               </div>
             </div>
           
-            <div class="col-md-4">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Verified <i class="required">*</i></label>
                 <select class="form-control" ng-model="data.User.verified" ng-options="opt.id as opt.value for opt in bool" data-validation-engine="validate[required]">
                   <option value=""></option>
                 </select>
               </div>
+              </div>
             </div>
-      
+
             <div class="clearfix"></div><hr>
 
             <div class="col-md-3 pull-left">
@@ -118,9 +131,12 @@
         </form>
   			<hr>
   			<div class="row">
-  				<div class="col-md-3 pull-right">
-  					<button class="btn btn-primary btn-sm btn-block" ng-click="update()">UPDATE</button>
-  				</div>
+  				<div class="col-md-2 pull-right">
+            <button class="btn btn-primary btn-sm btn-block" ng-click="update()">UPDATE</button>
+          </div>
+          <div class="col-md-2 pull-right">
+            <a href="#/cruds" class="btn btn-default btn-sm btn-block">CANCEL</a>
+          </div>
   			</div>
   	  </div>
     </div>

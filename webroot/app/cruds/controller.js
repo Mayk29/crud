@@ -48,6 +48,9 @@ app.controller('CrudsController', function($scope, Crud) {
   };
 
   $scope.doAdvanceSearch = function(page) {
+    // Reset active tab to ALL so tabStatus doesn't override the status filter
+    $scope.activeTab = 'ALL';
+    $scope.searchTxt = '';
     $scope.lastAdvanceParams = {
       searchName:   $scope.advanceSearch.name   || '',
       searchAge:    $scope.advanceSearch.age    || '',
@@ -131,7 +134,7 @@ app.controller('CrudsAddController', function($scope, $http, Crud) {
 
   $scope.onFileSelect = function(el) {
     for (var i = 0; i < el.files.length; i++) $scope.pendingFiles.push(el.files[i]);
-    $scope.$apply();
+    if (!$scope.$$phase) { $scope.$apply(); }
     el.value = '';
   };
 
@@ -194,7 +197,7 @@ app.controller('CrudsViewController', function($scope, $routeParams, Crud, CrudF
     Crud.get({ id: $scope.id }, function(e) {
       if (e.ok) {
         $scope.data = e.data;
-        $scope.$apply();
+
       }
     });
   };
@@ -263,8 +266,18 @@ app.controller('CrudsEditController', function($scope, $routeParams, $http, Crud
     $scope.data.Crud.age = age;
   };
 
-  $scope.addBeneficiary    = function() { $scope.beneficiaries.push({ name: '', birthDate: '', age: '' }); };
-  $scope.removeBeneficiary = function(i) { $scope.beneficiaries.splice(i, 1); };
+  $scope.addBeneficiary = function() { $scope.beneficiaries.push({ name: '', birthDate: '', age: '' }); };
+
+  $scope.removeBeneficiary = function(i) {
+    var b = $scope.beneficiaries[i];
+    if (b.id) {
+      // Existing DB record — mark for deletion; actual delete happens on UPDATE
+      b._toDelete = true;
+    } else {
+      // New unsaved row — just remove from the array immediately
+      $scope.beneficiaries.splice(i, 1);
+    }
+  };
 
   $scope.computeBeneficiaryAge = function(b) {
     if (!b.birthDate) return;
@@ -295,10 +308,16 @@ app.controller('CrudsEditController', function($scope, $routeParams, $http, Crud
           name:      e.data.name,
           email:     e.data.email,
           birthDate: e.data.birthDate,
-          age:       e.data.age
+          age:       parseInt(e.data.age, 10) || 0
         };
-        $scope.beneficiaries = e.data.Beneficiary || [];
-        $scope.existingFiles = e.data.CrudFile    || [];
+        // Cast each beneficiary's age to a real integer so <input type="number"> renders it
+        var bens = e.data.Beneficiary || [];
+        for (var i = 0; i < bens.length; i++) {
+          bens[i].age = parseInt(bens[i].age, 10) || 0;
+        }
+        $scope.beneficiaries = bens;
+        $scope.existingFiles = e.data.CrudFile || [];
+
       }
     });
   };
@@ -307,26 +326,15 @@ app.controller('CrudsEditController', function($scope, $routeParams, $http, Crud
 
   $scope.onFileSelect = function(el) {
     for (var i = 0; i < el.files.length; i++) $scope.pendingFiles.push(el.files[i]);
-    $scope.$apply();
+    if (!$scope.$$phase) { $scope.$apply(); }
     el.value = '';
   };
 
   $scope.removePendingFile = function(i) { $scope.pendingFiles.splice(i, 1); };
 
   $scope.deleteFile = function(file) {
-    bootbox.confirm('Delete file "' + file.original + '"?', function(c) {
-      if (c) {
-        CrudFile.deleteFile({ id: file.id }, function(e) {
-          if (e.ok) {
-            $.gritter.add({ title: 'Deleted!', text: e.msg });
-            var idx = $scope.existingFiles.indexOf(file);
-            if (idx > -1) $scope.$apply(function() { $scope.existingFiles.splice(idx, 1); });
-          } else {
-            $.gritter.add({ title: 'Warning!', text: e.msg });
-          }
-        });
-      }
-    });
+    // Just mark for deletion — actual delete happens when UPDATE is clicked
+    file._toDelete = true;
   };
 
   $scope._uploadPendingFiles = function(callback) {
@@ -359,8 +367,15 @@ app.controller('CrudsEditController', function($scope, $routeParams, $http, Crud
       return;
     }
     var valid = $('#form-edit').validationEngine('validate');
-    if (valid) {
-      $scope.data.Beneficiary = $scope.beneficiaries;
+    if (!valid) return;
+
+    var bensToDelete   = $scope.beneficiaries.filter(function(b) { return b._toDelete && b.id; });
+    var filesToDelete  = $scope.existingFiles.filter(function(f) { return f._toDelete && f.id; });
+    var totalToDelete  = bensToDelete.length + filesToDelete.length;
+
+    // ── Step 3: run the actual record update ─────────────────────────────────
+    var doUpdate = function() {
+      $scope.data.Beneficiary = $scope.beneficiaries.filter(function(b) { return !b._toDelete; });
       Crud.update({ id: $scope.id }, $scope.data, function(e) {
         if (e.ok) {
           $scope._uploadPendingFiles(function(uploadErr) {
@@ -375,6 +390,55 @@ app.controller('CrudsEditController', function($scope, $routeParams, $http, Crud
           $.gritter.add({ title: 'Warning!', text: e.msg });
         }
       });
+    };
+
+    // ── Step 2: delete all marked items via API, then doUpdate ───────────────
+    var processDeletionsAndUpdate = function() {
+      var remaining = totalToDelete, errors = [];
+
+      var onDone = function() {
+        remaining--;
+        if (remaining === 0) {
+          if (errors.length) { $.gritter.add({ title: 'Warning!', text: errors.join('\n') }); }
+          doUpdate();
+        }
+      };
+
+      angular.forEach(bensToDelete, function(b) {
+        $http.delete(api + 'cruds/delete_beneficiary/' + b.id + '.json')
+          .then(function(res) {
+            if (!res.data.ok) errors.push(res.data.msg);
+          }, function() {
+            errors.push('Could not delete beneficiary ID ' + b.id);
+          })
+          .finally(onDone);
+      });
+
+      angular.forEach(filesToDelete, function(f) {
+        CrudFile.deleteFile({ id: f.id }, function(e) {
+          if (!e.ok) errors.push('Could not delete file "' + f.original + '": ' + e.msg);
+          // Remove from existingFiles list so it disappears from view
+          var idx = $scope.existingFiles.indexOf(f);
+          if (idx > -1) { $scope.existingFiles.splice(idx, 1); }
+          onDone();
+        });
+      });
+    };
+
+    // ── Step 1: confirm if anything is marked for deletion ───────────────────
+    if (totalToDelete > 0) {
+      var parts = [];
+      if (bensToDelete.length === 1) parts.push('1 beneficiary');
+      else if (bensToDelete.length > 1) parts.push(bensToDelete.length + ' beneficiaries');
+      if (filesToDelete.length === 1) parts.push('1 attachment');
+      else if (filesToDelete.length > 1) parts.push(filesToDelete.length + ' attachments');
+
+      bootbox.confirm('Are you sure you want to delete ' + parts.join(' and ') + '?', function(c) {
+        if (c) { processDeletionsAndUpdate(); }
+        // Cancelled — stay on edit page, nothing is changed
+      });
+    } else {
+      doUpdate();
     }
   };
 

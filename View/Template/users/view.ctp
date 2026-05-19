@@ -67,13 +67,20 @@
     <hr>
 
     <div class="row">
-      <div class="col-md-12">
-        <div class="btn-group btn-group-sm pull-right btn-min">
-
-          <a href="#/user/edit/{{ data.User.id }}" class="btn btn-primary btn-min"><i class="fa fa-edit"></i> EDIT</a> 
-          <button class="btn btn-danger btn-min" ng-click="remove(data.User)"><i class="fa fa-trash"></i> DELETE</button>
-
-        </div> 
+      <div class="col-md-2">
+        <a href="#/users" class="btn btn-default btn-sm btn-block">
+          <i class="fa fa-arrow-left"></i> BACK
+        </a>
+      </div>
+      <div class="col-md-2">
+        <a href="#/user/edit/{{ data.User.id }}" class="btn btn-primary btn-sm btn-block">
+          <i class="fa fa-edit"></i> EDIT
+        </a>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-danger btn-sm btn-block" ng-click="remove(data.User)">
+          <i class="fa fa-trash"></i> DELETE
+        </button>
       </div>
     </div>
   </div>

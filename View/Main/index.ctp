@@ -129,7 +129,7 @@
         }
       });
     }
-    window.addEventListener('hashchange', setActiveNav);
+
     setActiveNav();
 
     function updateClock() {

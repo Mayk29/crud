@@ -92,6 +92,15 @@ class CrudsController extends AppController {
     } else {
       $status = !empty($crud['CrudStatus']['name']) ? $crud['CrudStatus']['name'] : 'PENDING';
 
+      // Cast Beneficiary age fields to int (MySQL returns all columns as strings)
+      $beneficiaries = array();
+      if (!empty($crud['Beneficiary'])) {
+        foreach ($crud['Beneficiary'] as $b) {
+          $b['age'] = (int) $b['age'];
+          $beneficiaries[] = $b;
+        }
+      }
+
       // Build files list with download URL
       $files = array();
       if (!empty($crud['CrudFile'])) {
@@ -116,7 +125,7 @@ class CrudsController extends AppController {
           'birthDate'   => $crud['Crud']['birthDate'],
           'age'         => (int) $crud['Crud']['age'],
           'status'      => $status,
-          'Beneficiary' => $crud['Beneficiary'],
+          'Beneficiary' => $beneficiaries,
           'CrudFile'    => $files,
         ),
       );
@@ -308,6 +317,28 @@ class CrudsController extends AppController {
     }
 
     $this->set(array('response' => $response, '_serialize' => 'response'));
+  }
+
+  // DELETE BENEFICIARY
+  // DELETE /api/cruds/delete_beneficiary/1.json  (1 = beneficiary id)
+  public function delete_beneficiary($id = null) {
+    if (!$this->Crud->Beneficiary->exists($id)) {
+      $response = array('ok' => false, 'msg' => 'Beneficiary not found.');
+      $this->set(array('response' => $response, '_serialize' => 'response'));
+      return;
+    }
+
+    if ($this->Crud->Beneficiary->delete($id)) {
+      $response = array('ok' => true, 'msg' => 'Beneficiary deleted.');
+    } else {
+      $response = array('ok' => false, 'msg' => 'Could not delete beneficiary.');
+    }
+
+    $this->set(array('response' => $response, '_serialize' => 'response'));
+  }
+
+  public function api_delete_beneficiary($id = null) {
+    return $this->delete_beneficiary($id);
   }
 
   // UPLOAD FILE

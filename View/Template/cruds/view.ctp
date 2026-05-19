@@ -1,12 +1,8 @@
 <div class="panel panel-primary">
-  <div class="panel-heading"><i class="fa fa-dot-circle-o"></i> VIEW CRUD</div>
+  <div class="panel-heading" style="color:black"><i class="fa fa-dot-circle-o"></i> VIEW CRUD</div>
   <div class="panel-body">
 
     <table class="table table-bordered">
-      <tr>
-        <th style="width:180px">ID</th>
-        <td>{{ data.id }}</td>
-      </tr>
       <tr>
         <th>Name</th>
         <td class="uppercase">{{ data.name }}</td>
@@ -21,7 +17,7 @@
       </tr>
       <tr>
         <th>Birth Date</th>
-        <td>{{ data.birthDate }}</td>
+        <td>{{ data.birthDate | date:'MM/dd/yyyy' }}</td>
       </tr>
       <tr>
         <th>Status</th>
@@ -49,7 +45,7 @@
       <tbody>
         <tr ng-repeat="beneficiary in data.Beneficiary">
           <td>{{ beneficiary.name }}</td>
-          <td>{{ beneficiary.birthDate }}</td>
+          <td>{{ beneficiary.birthDate | date:'MM/dd/yyyy' }}</td>
           <td>{{ beneficiary.age }}</td>
         </tr>
         <tr ng-if="!data.Beneficiary || data.Beneficiary.length == 0">

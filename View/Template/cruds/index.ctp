@@ -104,6 +104,7 @@
           <tr>
             <th class="w10px">&nbsp;&nbsp;&nbsp;</th>
             <th>NAME</th>
+            <th>EMAIL</th>
             <th>AGE</th>
             <th>BIRTH DATE</th>
             <th>STATUS</th>
@@ -114,8 +115,9 @@
           <tr ng-repeat="data in cruds">
             <td class="text-center">{{ (paginator.page - 1) * paginator.limit + $index + 1 }}</td>
             <td class="uppercase">{{ data.name }}</td>
+            <td>{{ data.email || '—' }}</td>
             <td>{{ data.age }}</td>
-            <td>{{ data.birthDate }}</td>
+            <td>{{ data.birthDate | date:'MM/dd/yyyy' }}</td>
             <td class="text-center">
               <span class="label label-{{ data.status == 'APPROVED' ? 'success' : (data.status == 'DISAPPROVED' ? 'danger' : 'warning') }}">
                 {{ data.status || 'PENDING' }}
@@ -144,7 +146,7 @@
             </td>
           </tr>
           <tr ng-if="cruds.length == 0">
-            <td colspan="6" class="text-center">No records found.</td>
+            <td colspan="7" class="text-center">No records found.</td>
           </tr>
         </tbody>
       </table>

@@ -1,10 +1,11 @@
 <div class="panel panel-primary">
-  <div class="panel-heading"><i class="fa fa-dot-circle-o"></i> ADD CRUD</div>
+  <div class="panel-heading" style="color:black"><i class="fa fa-dot-circle-o"></i> ADD CRUD</div>
   <div class="panel-body">
 
     <form id="form">
-      <div class="row">
 
+      <!-- Row 1: Name | Email -->
+      <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             <label>Name <i class="required" style="color:red">*</i></label>
@@ -12,7 +13,6 @@
                    data-validation-engine="validate[required]" placeholder="Name">
           </div>
         </div>
-
         <div class="col-md-6">
           <div class="form-group">
             <label>Email</label>
@@ -20,23 +20,24 @@
                    data-validation-engine="validate[custom[email]]" placeholder="Email Address">
           </div>
         </div>
+      </div>
 
-        <div class="col-md-6">
-          <div class="form-group">
-            <label>Age <i class="required" style="color:red">*</i></label>
-            <input type="number" class="form-control" ng-model="data.Crud.age"
-                   data-validation-engine="validate[required,custom[integer]]" placeholder="Age">
-          </div>
-        </div>
-
+      <!-- Row 2: Birth Date | Age -->
+      <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             <label>Birth Date <i class="required" style="color:red">*</i></label>
             <input type="date" class="form-control" ng-model="data.Crud.birthDate" ng-change="computeAge()"
-                   data-validation-engine="validate[required,custom[date]]" placeholder="Birth Date">
+                   data-validation-engine="validate[required,custom[date]]">
           </div>
         </div>
-
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Age <i class="required" style="color:red">*</i></label>
+            <input type="number" class="form-control" ng-model="data.Crud.age"
+                   data-validation-engine="validate[required,custom[integer]]" placeholder="Age" readonly>
+          </div>
+        </div>
       </div>
 
       <hr>
@@ -53,7 +54,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="beneficiary in beneficiaries">
+          <tr ng-repeat="beneficiary in beneficiaries track by $index">
             <td>
               <input type="text" class="form-control" ng-model="beneficiary.name">
             </td>

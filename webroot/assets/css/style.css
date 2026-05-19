@@ -490,11 +490,11 @@ body.flux-layout {
    ============================================================ */
 .form-control {
   border-radius: 8px !important;
-  border: 1.5px solid #e2e8f0 !important;
+  border: 1.5px solid #c8d0e0 !important;       /* was #e2e8f0 — now visible against white */
   font-size: var(--flux-text-sm) !important;
   color: var(--flux-text-primary) !important;
-  background: #fafbff !important;
-  box-shadow: none !important;
+  background: #ffffff !important;               /* pure white — clear contrast with border */
+  box-shadow: 0 1px 3px rgba(15,17,23,0.06) !important;  /* subtle depth */
   transition: var(--flux-transition) !important;
   height: 38px;
   padding: 8px 12px;
@@ -503,6 +503,22 @@ body.flux-layout {
   border-color: var(--flux-accent) !important;
   background: #fff !important;
   box-shadow: 0 0 0 3px var(--flux-accent-glow) !important;
+  outline: none !important;
+}
+/* Readonly / computed fields (e.g. Age auto-filled from Birth Date) */
+.form-control[readonly],
+.form-control[disabled] {
+  background: #f1f5fb !important;               /* light blue-gray tint — clearly non-editable */
+  border-color: #d0d9e8 !important;
+  color: var(--flux-text-muted) !important;
+  cursor: default !important;
+  box-shadow: none !important;
+}
+/* Inputs inside table cells (beneficiary rows) */
+.table .form-control {
+  height: 34px;
+  padding: 5px 10px;
+  font-size: var(--flux-text-sm) !important;
 }
 label { font-size: var(--flux-text-sm); font-weight: 600; color: var(--flux-text-primary); margin-bottom: 5px; }
 
