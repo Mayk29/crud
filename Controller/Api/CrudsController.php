@@ -442,4 +442,15 @@ class CrudsController extends AppController {
     $this->set(array('response' => $response, '_serialize' => 'response'));
   }
 
+  // Prefix-routing aliases so /api/cruds/upload_file/:id and
+  // /api/cruds/delete_file/:id resolve correctly when 'api' is a
+  // registered prefix in Routing.prefixes (CakePHP calls api_<action>).
+  public function api_upload_file($id = null) {
+    return $this->upload_file($id);
+  }
+
+  public function api_delete_file($id = null) {
+    return $this->delete_file($id);
+  }
+
 }
