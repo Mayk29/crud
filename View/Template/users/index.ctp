@@ -22,7 +22,7 @@
               <th>USERNAME</th>
               <th>STATUS</th>
               <th>ROLE</th>
-              <th class="w100px"></th>
+              <th class="w100px">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -34,11 +34,10 @@
               <td>{{ data.active? 'ACTIVE':'NOT ACTIVE' }}</td>
               <td class="uppercase">{{ data.role }}</td>
               <td>
-                <div class="btn-group btn-group-xs">
-                  <a href="#/user/view/{{ data.id }}" class="btn btn-success" title="VIEW"><i class="fa fa-eye"></i></a> 
-                  <a href="#/user/edit/{{ data.id }}" class="btn btn-primary" title="EDIT"><i class="fa fa-edit"></i></a> 
+                <div class="btn-group btn-group-xs" style="display:inline-flex;flex-wrap:nowrap;gap:3px;">
+                  <a href="#/user/view/{{ data.id }}" class="btn btn-info" title="VIEW"><i class="fa fa-eye"></i></a>
+                  <a href="#/user/edit/{{ data.id }}" class="btn btn-warning" title="EDIT"><i class="fa fa-edit"></i></a>
                   <a href="javascript:void(0)" ng-click="remove(data)" class="btn btn-danger" title="DELETE"><i class="fa fa-trash"></i></a>
-
                 </div>
               </td>
                 

@@ -58,10 +58,10 @@
               <input type="text" class="form-control" ng-model="beneficiary.name" placeholder="Beneficiary Name">
             </td>
             <td>
-              <input type="date" class="form-control" ng-model="beneficiary.birthDate" ng-change="computeBeneficiaryAge(beneficiary)">
+              <input type="date" class="form-control" ng-model="beneficiary.birthDate">
             </td>
             <td>
-              <input type="number" class="form-control" ng-model="beneficiary.age" readonly>
+              <input type="text" class="form-control" ng-model="beneficiary.age" readonly>
             </td>
             <td>
               <button type="button" class="btn btn-danger btn-sm" ng-click="removeBeneficiary($index)">Delete</button>

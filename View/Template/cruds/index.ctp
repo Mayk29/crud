@@ -122,18 +122,18 @@
               </span>
             </td>
             <td>
-              <div class="btn-group btn-group-xs">
-                <!-- VIEW always enabled -->
-                <a href="#/cruds/view/{{ data.id }}" class="btn btn-success" title="VIEW">
+              <div class="btn-group btn-group-xs" style="display:inline-flex;flex-wrap:nowrap;gap:3px;">
+                <!-- VIEW — blue/info: neutral read action -->
+                <a href="#/cruds/view/{{ data.id }}" class="btn btn-info" title="VIEW">
                   <i class="fa fa-eye"></i>
                 </a>
-                <!-- EDIT disabled when APPROVED or DISAPPROVED -->
+                <!-- EDIT — amber/warning: modify action, disabled when locked -->
                 <a href="{{ (data.status == 'APPROVED' || data.status == 'DISAPPROVED') ? 'javascript:void(0)' : '#/cruds/edit/' + data.id }}"
-                   class="btn btn-primary {{ (data.status == 'APPROVED' || data.status == 'DISAPPROVED') ? 'disabled' : '' }}"
+                   class="btn btn-warning {{ (data.status == 'APPROVED' || data.status == 'DISAPPROVED') ? 'disabled' : '' }}"
                    title="EDIT">
                   <i class="fa fa-edit"></i>
                 </a>
-                <!-- DELETE disabled when APPROVED or DISAPPROVED -->
+                <!-- DELETE — red/danger: destructive action, disabled when locked -->
                 <a href="javascript:void(0)"
                    ng-click="(data.status == 'APPROVED' || data.status == 'DISAPPROVED') ? null : remove(data)"
                    class="btn btn-danger {{ (data.status == 'APPROVED' || data.status == 'DISAPPROVED') ? 'disabled' : '' }}"

@@ -1,91 +1,256 @@
 @import url(fonts/opensans/css.css);
 @import url(fonts/homizio-nova/css.css);
 
-body {
-	font-family: 'Open Sans';
-	background: url(../img/bg.jpg) fixed;
-	background-size: 100% 100%;
+:root {
+  --flux-accent:      #4caf6e;
+  --flux-accent-2:    #38936a;
+  --flux-accent-glow: rgba(76,175,110,.2);
+  --flux-dark:        #0f1117;
+  --flux-dark-2:      #1a1e2e;
+  --flux-transition:  all 0.22s cubic-bezier(.4,0,.2,1);
 }
 
-.svg-icon {
-    display:inline-block;
-    width:15px;
-    height:15px;
-    box-sizing: border-box;
-}
-.svg-icon svg {
-    width:100%;
-    height:100%;
-    fill: #fff;
+*, *::before, *::after { box-sizing: border-box; }
+
+body.flux-login-body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--flux-dark);
+  overflow: hidden;
 }
 
-.btn-icon {
-	width: 30px;
-	height: 30px;
+/* Animated background circles */
+.flux-login-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.flux-login-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.07;
+  animation: floatCircle 12s ease-in-out infinite;
+}
+.flux-circle-1 {
+  width: 500px; height: 500px;
+  background: var(--flux-accent);
+  top: -150px; right: -100px;
+  animation-delay: 0s;
+}
+.flux-circle-2 {
+  width: 350px; height: 350px;
+  background: #3b82f6;
+  bottom: -80px; left: -80px;
+  animation-delay: -4s;
+}
+.flux-circle-3 {
+  width: 250px; height: 250px;
+  background: var(--flux-accent);
+  bottom: 100px; right: 200px;
+  animation-delay: -8s;
+}
+@keyframes floatCircle {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33%       { transform: translate(20px,-30px) scale(1.05); }
+  66%       { transform: translate(-15px,20px) scale(0.96); }
 }
 
-#login {
-	padding: 20px;
-	background: rgba(0,0,0,0.15);
-}
-#login h1 {
-	font-size: 70px;
-	font-weight: 100;
-	margin: 0px;
-	text-align: center;
-	color: #FFF;
+/* Layout */
+.flux-login-wrap {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
-#login header p {
-	font-size: 14px;
-	text-shadow: rgba(255, 255, 255, 0.4) 0px 0px 3px;
-	text-align: center;
-	color: #FFF;
-	letter-spacing: 1.5px;
-	font-family: 'Homizio Nova Light';
+.flux-login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#box-login {
-	width: 500px;
-	/*position: fixed;*/
-	left: 50%;
-	margin-left: -250px;
-	margin-top: 60px;
-	color: #fff;
+/* Left panel */
+.flux-login-left {
+  flex: 1;
+  flex-direction: column;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, rgba(76,175,110,.08) 0%, rgba(56,147,106,.04) 100%);
+  border-right: 1px solid rgba(255,255,255,.06);
 }
-#branch_name{
-	text-transform: uppercase;
+.flux-login-brand {
+  text-align: center;
 }
-.login-title {
-	font-weight: 100;
-	font-size: 24px;
-	margin-bottom: 20px;
-	color: #fff;
+.flux-login-logo-ring {
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 28px;
+  border: 3px solid var(--flux-accent);
+  box-shadow:
+    0 0 0 8px rgba(76,175,110,.1),
+    0 0 40px rgba(76,175,110,.2);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 8px rgba(76,175,110,.1), 0 0 40px rgba(76,175,110,.2); }
+  50%       { box-shadow: 0 0 0 14px rgba(76,175,110,.07), 0 0 60px rgba(76,175,110,.3); }
+}
+.flux-login-logo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.flux-login-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  letter-spacing: -0.5px;
+}
+.flux-login-tagline {
+  font-size: 12px;
+  color: var(--flux-accent);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0;
 }
 
-.btn-min {
-	min-width: 150px;
+/* Right panel */
+.flux-login-right {
+  width: 420px;
+  flex-shrink: 0;
+  background: #ffffff;
+  padding: 0;
+  flex-direction: column;
+}
+.flux-login-form-wrap {
+  width: 100%;
+  padding: 52px 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+.flux-login-form-header {
+  margin-bottom: 36px;
+}
+.flux-login-form-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f1117;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+.flux-login-form-header p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
 }
 
-.input-form {
-	height: 100%;
-	padding: 15px 15px;	
+/* Form fields */
+.flux-field-group {
+  margin-bottom: 20px;
+}
+.flux-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+.flux-input-wrap {
+  position: relative;
+}
+.flux-input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+.flux-input-icon svg { width: 14px; height: 14px; }
+
+.flux-input,
+.flux-input-wrap input[type="text"],
+.flux-input-wrap input[type="password"] {
+  width: 100%;
+  padding: 11px 14px 11px 40px !important;
+  border: 1.5px solid #e5e7eb !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+  color: #111827 !important;
+  background: #f9fafb !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: var(--flux-transition) !important;
+  height: auto !important;
+  font-family: 'Open Sans', sans-serif !important;
+  display: block !important;
+}
+.flux-input:focus,
+.flux-input-wrap input[type="text"]:focus,
+.flux-input-wrap input[type="password"]:focus {
+  border-color: var(--flux-accent) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px var(--flux-accent-glow) !important;
 }
 
-.footer {
-	color: #FFF;
-	font-size:12px;
-	width: 100%;
-	position: fixed;
-	bottom: 0px;
-	padding: 8px;
-	background: rgba(0,0,0,0.15);
+/* Login button */
+.flux-login-btn {
+  width: 100%;
+  padding: 13px 20px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, var(--flux-accent) 0%, var(--flux-accent-2) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: var(--flux-transition);
+  box-shadow: 0 4px 18px rgba(76,175,110,.35);
+  font-family: 'Open Sans', sans-serif;
+}
+.flux-login-btn svg { width: 16px; height: 16px; transition: var(--flux-transition); }
+.flux-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(76,175,110,.45);
+}
+.flux-login-btn:hover svg { transform: translateX(4px); }
+.flux-login-btn:active { transform: translateY(0); }
+
+.flux-login-footer {
+  margin-top: 40px;
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
+  letter-spacing: 0.3px;
 }
 
-.copyright, .poweredby {
-	text-align: center;
-}
+/* SVG icon compat */
+.svg-icon { display:inline-block; width:15px; height:15px; box-sizing:border-box; }
+.svg-icon svg { width:100%; height:100%; fill:#fff; }
 
-.poweredby > a {
-	color: #77C0FF;
+/* Responsive */
+@media (max-width: 768px) {
+  .flux-login-left  { display: none; }
+  .flux-login-right { width: 100%; }
+  .flux-login-form-wrap { padding: 40px 28px; min-height: 100vh; }
+}
+@media (max-width: 420px) {
+  .flux-login-form-wrap { padding: 32px 20px; }
 }
